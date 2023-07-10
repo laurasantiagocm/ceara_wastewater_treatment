@@ -5,22 +5,59 @@ import { useEffect, useState } from 'react';
 import LineChart from './graphs/Line';
 import getRandomObjectsFromArray from './utils/getRandomObjectsFromArray';
 import convertColumns from './utils/convertColumn';
+import MetGoalsAmount from './graphs/Bar/MetGoalsAmount';
 
 function App() {
-  const [wasterwaterData, setWasterwaterData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  const [wasterwaterData, setWasterwaterData] = useState([]); // todos os dados de esgoto e tratados
+
+  // filtros
+  const [selectedEtes, setSelectedEtes] = useState([]);
+  const [selectedTechs, setSelectedTechs] = useState([]);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  const [filteredData, setFilteredData] = useState([]); // dados filtrados
 
   useEffect(() => {
     readString(cageceData, papaConfig);
   }, []);
+  useEffect(() => {
+    console.log('filteredData mudou')
+    console.log({ filteredData })
+  }, [filteredData]);
+
+  function randomIntFromInterval(min, max) { // min and max included 
+    return Math.floor(Math.random() * (max - min + 1) + min)
+  }
+  
 
   useEffect(() => {
-    if (filteredData?.length === 0 && wasterwaterData?.length > 0) {
-      let randomObj = getRandomObjectsFromArray(wasterwaterData, 4)
-      console.log({ randomObj })
-      setFilteredData(randomObj)
+    if (wasterwaterData?.length > 0) {
+      let eteNamesToFilter = selectedEtes
+
+      if (eteNamesToFilter.length === 0) {
+        eteNamesToFilter = [`ETE ${randomIntFromInterval(1, 60)}`, `ETE ${randomIntFromInterval(1, 60)}`, `ETE ${randomIntFromInterval(1, 60)}`, `ETE ${randomIntFromInterval(1, 60)}`]
+      }
+      const dataFilteredByEte = wasterwaterData.filter((ete) => eteNamesToFilter.includes(ete.ETE))
+
+      const dataFilteredByTech = selectedTechs.length > 0 ? dataFilteredByEte.filter((ete) => selectedTechs.includes(ete.Tipo)) : dataFilteredByEte;
+      const dataFilteredByDate = dataFilteredByTech.filter((ete) => {
+        const eteDate = new Date(ete.Data);
+        if (startDate && endDate) {
+          return eteDate >= startDate && eteDate <= endDate;
+        }
+        if (startDate) {
+          return eteDate >= startDate;
+        }
+        if (endDate) {
+          return eteDate <= endDate;
+        }
+        return true;
+      });
+
+      setFilteredData(dataFilteredByDate);
     }
-  }, [filteredData, wasterwaterData]);
+  }, [wasterwaterData, selectedEtes, selectedTechs]);
 
   function convertCSVtoJSON(csvData) {
     const headers = csvData[0];
@@ -54,8 +91,13 @@ function App() {
   };
 
   return (
-    <LineChart />
+    <>
+      <MetGoalsAmount data={filteredData} />
+      {/* <LineChart data={setFilteredData} /> */}
+    </>
   );
 }
 
 export default App;
+
+

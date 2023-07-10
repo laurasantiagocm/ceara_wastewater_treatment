@@ -1,5 +1,4 @@
 const convertColumns = (array) => {
-  console.log({ arraydentro: array })
   const convertedArray = array.map((obj) => {
     const newObj = {
       ...obj,
@@ -21,7 +20,6 @@ const convertColumns = (array) => {
     return newObj;
   });
 
-  console.log({ arrayconvertid: convertedArray })
   return convertedArray;
 }
 
