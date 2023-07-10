@@ -6,6 +6,7 @@ import LineChart from './graphs/Line';
 import getRandomObjectsFromArray from './utils/getRandomObjectsFromArray';
 import convertColumns from './utils/convertColumn';
 import MetGoalsAmount from './graphs/Bar/MetGoalsAmount';
+import DqoValues from './graphs/Line/DqoValues';
 
 function App() {
   const [wasterwaterData, setWasterwaterData] = useState([]); // todos os dados de esgoto e tratados
@@ -93,7 +94,7 @@ function App() {
   return (
     <>
       <MetGoalsAmount data={filteredData} />
-      {/* <LineChart data={setFilteredData} /> */}
+      <DqoValues data={filteredData} />
     </>
   );
 }
